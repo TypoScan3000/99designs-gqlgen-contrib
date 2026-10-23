@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	existStatusFailure = "failure"
-	exitStatusSuccess  = "success"
+	exitStatusFailure = "failure"
+	exitStatusSuccess = "success"
 )
 
 var (
@@ -56,7 +56,7 @@ func RegisterOn(registerer prometheusclient.Registerer) {
 	resolverStartedCounter = prometheusclient.NewCounterVec(
 		prometheusclient.CounterOpts{
 			Name: "graphql_resolver_started_total",
-			Help: "Total number of resolver started on the graphql server.",
+			Help: "Total number of resolvers started on the graphql server.",
 		},
 		[]string{"object", "field"},
 	)
@@ -64,20 +64,20 @@ func RegisterOn(registerer prometheusclient.Registerer) {
 	resolverCompletedCounter = prometheusclient.NewCounterVec(
 		prometheusclient.CounterOpts{
 			Name: "graphql_resolver_completed_total",
-			Help: "Total number of resolver completed on the graphql server.",
+			Help: "Total number of resolvers completed on the graphql server.",
 		},
 		[]string{"object", "field"},
 	)
 
 	const start, factor, count = 1, 2, 11
-	//nolint:promlinter // change the label name will break the existing metrics
+	//nolint:promlinter // changing the label name will break the existing metrics
 	timeToResolveField = prometheusclient.NewHistogramVec(prometheusclient.HistogramOpts{
 		Name:    "graphql_resolver_duration_ms",
 		Help:    "The time taken to resolve a field by graphql server.",
 		Buckets: prometheusclient.ExponentialBuckets(start, factor, count),
 	}, []string{"exitStatus", "object", "field"})
 
-	//nolint:promlinter // change the label name will break the existing metrics
+	//nolint:promlinter // changing the label name will break the existing metrics
 	timeToHandleRequest = prometheusclient.NewHistogramVec(prometheusclient.HistogramOpts{
 		Name:    "graphql_request_duration_ms",
 		Help:    "The time taken to handle a request by graphql server.",
@@ -131,7 +131,7 @@ func (a Tracer) InterceptResponse(
 
 	var exitStatus string
 	if len(errList) > 0 {
-		exitStatus = existStatusFailure
+		exitStatus = exitStatusFailure
 	} else {
 		exitStatus = exitStatusSuccess
 	}
@@ -160,7 +160,7 @@ func (a Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (any,
 
 	var exitStatus string
 	if err != nil {
-		exitStatus = existStatusFailure
+		exitStatus = exitStatusFailure
 	} else {
 		exitStatus = exitStatusSuccess
 	}
